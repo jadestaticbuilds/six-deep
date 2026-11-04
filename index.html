@@ -305,21 +305,32 @@ function randomDeal(level, attempt) {
 }
 
 /* Deterministic per level: same level always deals the same verified board. */
+/* Target solution lengths for smooth difficulty ramp (Nov 3, 2026) */
+const TARGET_MOVES = {1:15, 2:20, 3:25, 4:30, 5:35, 6:40, 7:45, 8:50, 9:55, 10:60, 11:65, 12:70};
+
 function genLevel(level, opts) {
   opts = opts || {};
-  const minMoves = opts.minMoves || 12;
+  const target = opts.targetMoves || TARGET_MOVES[level] || 12;
+  const tolerance = 8; // accept within ±8 of target
+  let best = null, bestDiff = Infinity;
   for (let attempt = 0; attempt < 300; attempt++) {
     const d = randomDeal(level, attempt);
     if (isSolved(d.tubes)) continue;
     const sol = solve(d.tubes, { timeCapMs: 1000, nodeCap: 150000 });
-    if (sol && sol.moves.length >= minMoves) {
-      return {
-        tubes: d.tubes, colors: d.colors, tubesN: d.tubesN,
-        solutionLen: sol.moves.length, attempt, nodes: sol.nodes
-      };
+    if (sol) {
+      const diff = Math.abs(sol.moves.length - target);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        best = {
+          tubes: d.tubes, colors: d.colors, tubesN: d.tubesN,
+          solutionLen: sol.moves.length, attempt, nodes: sol.nodes
+        };
+        if (diff <= tolerance) break; // good enough
+      }
     }
   }
-  throw new Error('could not generate a verified deal for level ' + level);
+  if (!best) throw new Error('could not generate a verified deal for level ' + level);
+  return best;
 }
 
 function cloneTubes(tubes) { return tubes.map(t => t.slice()); }
