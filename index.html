@@ -22,9 +22,11 @@
       repeating-linear-gradient(0deg, transparent 0 118px, rgba(255,255,255,.028) 118px 122px),
       linear-gradient(180deg, #14313f 0%, #0d2231 60%, #0a1b27 100%);
     min-height:100vh;
+    min-height:100dvh;
     touch-action:manipulation;
     user-select:none;
     -webkit-user-select:none;
+    -webkit-touch-callout:none;
   }
   header{
     position:sticky; top:0; z-index:20;
@@ -93,7 +95,7 @@
   .c9{ background:radial-gradient(circle at 35% 30%, #fecaca, #f87171 55%, #991b1b); }
   .ball.pop{ animation:pop .22s; }
   @keyframes pop{ 0%{transform:scale(.6)} 60%{transform:scale(1.12)} 100%{transform:scale(1)} }
-  footer{ text-align:center; font-size:11px; opacity:.55; padding:0 0 26px; letter-spacing:1px; }
+  footer{ text-align:center; font-size:11px; opacity:.55; padding:0 0 calc(26px + env(safe-area-inset-bottom)); letter-spacing:1px; }
   #overlay{
     position:fixed; inset:0; z-index:50; display:none;
     align-items:center; justify-content:center; padding:24px;
